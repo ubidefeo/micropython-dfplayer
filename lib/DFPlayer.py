@@ -1,19 +1,29 @@
 # ----------------------------------------------------------------------------
-# CircuitPython driver library for the DFPlayer-Mini.
+# MicroPython driver library for the DFPlayer-Mini
+# 
+# Tested with modules based on YX5200.
+# Will not work with modules based off the GD3200B chip.
 #
-# The core of the code is from: https://github.com/jczic/KT403A-MP3 
-# (adapted to CircuitPython, changed naming, stripped down API)
+# (see https://github.com/enjoyneering/DFPlayer/blob/main/src/DFPlayer.h
+# if you want a reference to implement other chips)
 #
-# Author: Bernhard Bablok
-# License: MIT
-#
+# The original core of the code is from: https://github.com/jczic/KT403A-MP3 
+# (adapted to CircuitPython by Bernhard Bablok
 # Website: https://github.com/bablokb/circuitpython-dfplayer
+#
+#
+# License: MIT
+# 
+# Reworked by Ubi de Feo (github.com/ubidefeo) to remove BusIO/Board
+# and adapt to generic MicroPython's Machine UART
+# 
+# Defaults to UART 0
 #
 # ----------------------------------------------------------------------------
 
-import board
+from machine import UART
 import time
-import busio
+
 import struct
 
 class DFPlayer(object):
@@ -41,7 +51,7 @@ class DFPlayer(object):
 
   def __init__(self,uart=None,media=None,volume=50,eq=None,latency=0.100):
     if uart is None:
-      self._uart = busio.UART(board.TX,board.RX,baudrate=9600)
+      self._uart = UART(0,baudrate=9600)
     else:
       self._uart = uart
     self._latency = latency
@@ -76,7 +86,7 @@ class DFPlayer(object):
   # --- read data from device   ------------------------------------------------
 
   def _read_data(self):
-    if self._uart.in_waiting:
+    if self._uart.any():
       buf = self._uart.read(10)
       if buf is not None and \
              len(buf) ==   10 and \
