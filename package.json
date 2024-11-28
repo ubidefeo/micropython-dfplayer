@@ -1,0 +1,6 @@
+{
+    "urls": [
+      ["dfplayer/DFPlayer.py", "github:ubidefeo/micropython-dfplayer/lib/DFPlayer.py"]
+    ],    
+    "version": "1.0.0"
+}
